@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.5)
 project(atomicdex-desktop LANGUAGES CXX VERSION 0.3.0)
 
 
-option(DISABLE_GEOBLOCKING "Enable to disable geoblocking (for dev purpose)" OFF)
+option(DISABLE_GEOBLOCKING "Enable to disable geoblocking (for dev purpose)" ON)
 option(PREFER_BOOST_FILESYSTEM "Enable to use boost filesystem instead of std::filesystem" OFF)
 set(FETCHCONTENT_QUIET OFF CACHE BOOL "Override option" FORCE)
 
