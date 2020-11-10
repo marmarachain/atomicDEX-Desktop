@@ -147,6 +147,7 @@ namespace atomic_dex
             spdlog::info("change currency {} to {}", m_config.current_currency, current_currency.toStdString());
             atomic_dex::change_currency(m_config, current_currency.toStdString());
             this->dispatcher_.trigger<update_portfolio_values>();
+            this->dispatcher_.trigger<current_currency_changed>();
             emit onCurrencyChanged();
             emit onCurrencySignChanged();
             emit onFiatSignChanged();
@@ -245,7 +246,7 @@ namespace atomic_dex
     QString
     settings_page::get_custom_coins_icons_path() const noexcept
     {
-        return QString::fromStdString(get_runtime_coins_path().string());
+        return QString::fromStdString(utils::get_runtime_coins_path().string());
     }
 
     void
@@ -270,7 +271,7 @@ namespace atomic_dex
                     fs::copy_file(
                         icon_filepath.toStdString(),
                         fs::path(get_custom_coins_icons_path().toStdString()) / (boost::algorithm::to_lower_copy(ticker) + suffix.string()),
-                        fs::copy_option::overwrite_if_exists);
+                        get_override_options());
                 }
                 if (not is_this_ticker_present_in_raw_cfg(QString::fromStdString(ticker)))
                 {
@@ -280,7 +281,7 @@ namespace atomic_dex
                     out["mm2_cfg"]["protocol"]["protocol_data"]["platform"] = "ETH";
                     std::string out_address                                 = contract_address.toStdString();
                     boost::algorithm::to_lower(out_address);
-                    to_eth_checksum(out_address);
+                    utils::to_eth_checksum(out_address);
                     out["mm2_cfg"]["protocol"]["protocol_data"]["contract_address"] = out_address;
                     out["mm2_cfg"]["rpc_port"]                                      = 80;
                     out["mm2_cfg"]["coin"]                                          = ticker;
@@ -377,10 +378,10 @@ namespace atomic_dex
         using namespace std::string_literals;
         const std::string wallet_name     = qt_wallet_manager::get_default_wallet_name().toStdString();
         const std::string wallet_cfg_file = std::string(atomic_dex::get_raw_version()) + "-coins"s + "."s + wallet_name + ".json"s;
-        const fs::path    wallet_cfg_path = get_atomic_dex_config_folder() / wallet_cfg_file;
+        const fs::path    wallet_cfg_path = utils::get_atomic_dex_config_folder() / wallet_cfg_file;
         if (fs::exists(wallet_cfg_path))
         {
-            boost::system::error_code ec;
+            fs_error_code ec;
             fs::remove(wallet_cfg_path, ec);
             if (ec)
             {
