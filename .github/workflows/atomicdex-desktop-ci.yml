@@ -39,10 +39,10 @@ jobs:
             qt: '5.15.2'
             type: 'release'
 
-          - name: osx-qt-5-15-2-dbg
-            os: macos-latest
-            qt: '5.15.2'
-            type: 'debug'
+          #- name: osx-qt-5-15-2-dbg
+          #  os: macos-latest
+          #  qt: '5.15.2'
+          #  type: 'debug'
 
     steps:
       - uses: actions/checkout@v2
@@ -224,62 +224,62 @@ jobs:
           $Env:QT_VERSION = "${{ matrix.qt }}"
           .\ci_tools_atomic_dex\ci_scripts\windows_script.ps1
 
-      - name: Running Tests (Linux)
-        working-directory: ci_tools_atomic_dex
-        if: runner.os == 'Linux'
-        run: |
-          export REPORT_CI_TOKEN=${{ secrets.REPORT_CI_TOKEN_SECRET }}
-          export ATOMICDEX_TEST_SEED=${{ secrets.ATOMICDEX_TEST_SEED }}
-          export ATOMICDEX_PASSWORD=${{ secrets.ATOMICDEX_PASSWORD }}
-          export QT_INSTALL_CMAKE_PATH=${{ github.workspace }}/Qt/${{ matrix.qt }}/gcc_64/lib/cmake
-          export QT_ROOT=${{ github.workspace }}/Qt/${{ matrix.qt }}
-          export PATH=${{ github.workspace }}/Qt/${{ matrix.qt }}/gcc_64/bin:$PATH
-          export PATH=$HOME/.nimble/bin:$PATH
-          export CXXFLAGS=-stdlib=libc++
-          export LDFLAGS=-stdlib=libc++
-          export CXX=clang++-11
-          export CC=clang-11
-          echo "Running tests"
-          ./ci_tools_atomic_dex tests release
-          cd build-Release/bin/AntaraAtomicDexTestsAppDir/usr/bin
-          cat atomic-dex-tests-result.xml
-          curl https://report.ci/upload.py --output upload.py
-          ls
-          python upload.py --sha `git rev-parse HEAD` -n "[Doctest Linux]" --include='atomic-dex-tests-result.xml' --framework=doctest --merge ".*"
-          echo "Uploading tests on Linux finished"
+#       - name: Running Tests (Linux)
+#         working-directory: ci_tools_atomic_dex
+#         if: runner.os == 'Linux'
+#         run: |
+#           export REPORT_CI_TOKEN=${{ secrets.REPORT_CI_TOKEN_SECRET }}
+#           export ATOMICDEX_TEST_SEED=${{ secrets.ATOMICDEX_TEST_SEED }}
+#           export ATOMICDEX_PASSWORD=${{ secrets.ATOMICDEX_PASSWORD }}
+#           export QT_INSTALL_CMAKE_PATH=${{ github.workspace }}/Qt/${{ matrix.qt }}/gcc_64/lib/cmake
+#           export QT_ROOT=${{ github.workspace }}/Qt/${{ matrix.qt }}
+#           export PATH=${{ github.workspace }}/Qt/${{ matrix.qt }}/gcc_64/bin:$PATH
+#           export PATH=$HOME/.nimble/bin:$PATH
+#           export CXXFLAGS=-stdlib=libc++
+#           export LDFLAGS=-stdlib=libc++
+#           export CXX=clang++-11
+#           export CC=clang-11
+#           echo "Running tests"
+#           ./ci_tools_atomic_dex tests release
+#           cd build-Release/bin/AntaraAtomicDexTestsAppDir/usr/bin
+#           cat atomic-dex-tests-result.xml
+#           curl https://report.ci/upload.py --output upload.py
+#           ls
+#           python upload.py --sha `git rev-parse HEAD` -n "[Doctest Linux]" --include='atomic-dex-tests-result.xml' --framework=doctest --merge ".*"
+#           echo "Uploading tests on Linux finished"
 
-      - name: Running Tests (MacOS)
-        working-directory: ci_tools_atomic_dex
-        if: runner.os == 'macOS'
-        run: |
-          export REPORT_CI_TOKEN=${{ secrets.REPORT_CI_TOKEN_SECRET }}
-          export ATOMICDEX_TEST_SEED=${{ secrets.ATOMICDEX_TEST_SEED }}
-          export ATOMICDEX_PASSWORD=${{ secrets.ATOMICDEX_PASSWORD }}
-          export QT_INSTALL_CMAKE_PATH=${{ github.workspace }}/Qt/${{ matrix.qt }}/clang_64/lib/cmake
-          export QT_ROOT=${{ github.workspace }}/Qt/${{ matrix.qt }}
-          echo "Running tests"
-          ./ci_tools_atomic_dex tests ${{ matrix.type }}
-          cd build-${{ matrix.type }}/bin/atomicdex-desktop_tests.app/Contents/MacOS
-          cat atomic-dex-tests-result.xml
-          curl https://report.ci/upload.py --output upload.py
-          ls
-          python upload.py --sha `git rev-parse HEAD` -n "[Doctest MacOS ${{ matrix.type }}]" --include='atomic-dex-tests-result.xml' --framework=doctest --merge ".*"
-          echo "Uploading tests on OSX finished"
+#       - name: Running Tests (MacOS)
+#         working-directory: ci_tools_atomic_dex
+#         if: runner.os == 'macOS'
+#         run: |
+#           export REPORT_CI_TOKEN=${{ secrets.REPORT_CI_TOKEN_SECRET }}
+#           export ATOMICDEX_TEST_SEED=${{ secrets.ATOMICDEX_TEST_SEED }}
+#           export ATOMICDEX_PASSWORD=${{ secrets.ATOMICDEX_PASSWORD }}
+#           export QT_INSTALL_CMAKE_PATH=${{ github.workspace }}/Qt/${{ matrix.qt }}/clang_64/lib/cmake
+#           export QT_ROOT=${{ github.workspace }}/Qt/${{ matrix.qt }}
+#           echo "Running tests"
+#           ./ci_tools_atomic_dex tests ${{ matrix.type }}
+#           cd build-${{ matrix.type }}/bin/atomicdex-desktop_tests.app/Contents/MacOS
+#           cat atomic-dex-tests-result.xml
+#           curl https://report.ci/upload.py --output upload.py
+#           ls
+#           python upload.py --sha `git rev-parse HEAD` -n "[Doctest MacOS ${{ matrix.type }}]" --include='atomic-dex-tests-result.xml' --framework=doctest --merge ".*"
+#           echo "Uploading tests on OSX finished"
 
-      - name: Running Tests (Windows)
-        shell: powershell
-        working-directory: ci_tools_atomic_dex
-        if: runner.os == 'Windows'
-        run: |
-          echo "Running tests"
-          $Env:REPORT_CI_TOKEN = "${{ secrets.REPORT_CI_TOKEN_SECRET }}"
-          $Env:QT_INSTALL_CMAKE_PATH = "C:\Qt\${{ matrix.qt }}\msvc2019_64"
-          cmd /c '.\ci_tools_atomic_dex.exe tests release 2>&1'
-          cd build-Release
-          cd bin
-          ls
-          Invoke-WebRequest -Uri https://report.ci/upload.py -OutFile upload.py
-          python upload.py --sha $(git rev-parse HEAD) -n "[Doctest Windows]" --include='atomic-dex-tests-result.xml' --framework=doctest --merge ".*"
+#       - name: Running Tests (Windows)
+#         shell: powershell
+#         working-directory: ci_tools_atomic_dex
+#         if: runner.os == 'Windows'
+#         run: |
+#           echo "Running tests"
+#           $Env:REPORT_CI_TOKEN = "${{ secrets.REPORT_CI_TOKEN_SECRET }}"
+#           $Env:QT_INSTALL_CMAKE_PATH = "C:\Qt\${{ matrix.qt }}\msvc2019_64"
+#           cmd /c '.\ci_tools_atomic_dex.exe tests release 2>&1'
+#           cd build-Release
+#           cd bin
+#           ls
+#           Invoke-WebRequest -Uri https://report.ci/upload.py -OutFile upload.py
+#           python upload.py --sha $(git rev-parse HEAD) -n "[Doctest Windows]" --include='atomic-dex-tests-result.xml' --framework=doctest --merge ".*"
 
       - name: Upload env variable for artifacts (Linux)
         if: runner.os == 'Linux'
